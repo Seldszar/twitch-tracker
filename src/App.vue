@@ -8,28 +8,28 @@
         <EventPanel
           title="Subscriptions & Resubscriptions"
           :events="events.filter(o => ['sub', 'resub'].includes(o.type))"
-          @acknowledge="acknowledgeEvent"
+          @acknowledge="acknowledgeEvents"
         />
       </div>
       <div :class="$style.eventPanel">
         <EventPanel
-          title="Subscription Mystery Gifts"
-          :events="events.filter(o => ['submysterygift'].includes(o.type))"
-          @acknowledge="acknowledgeEvent"
+          title="Subscription Gifts"
+          :events="events.filter(o => ['anonsubgif', 'subgift', 'submysterygift'].includes(o.type))"
+          @acknowledge="acknowledgeEvents"
         />
       </div>
       <div :class="$style.eventPanel">
         <EventPanel
           title="Cheers"
           :events="events.filter(o => ['cheer'].includes(o.type))"
-          @acknowledge="acknowledgeEvent"
+          @acknowledge="acknowledgeEvents"
         />
       </div>
       <div :class="$style.eventPanel">
         <EventPanel
           title="Raids & Hosts"
           :events="events.filter(o => ['raid', 'host'].includes(o.type))"
-          @acknowledge="acknowledgeEvent"
+          @acknowledge="acknowledgeEvents"
         />
       </div>
     </div>
@@ -47,6 +47,8 @@ import * as tekko from "tekko";
 
 import EventPanel from "./components/EventPanel.vue";
 import StreamStatus from "./components/StreamStatus.vue";
+
+const pendingMysteryGifts = new WeakMap();
 
 export default {
   components: {
@@ -113,12 +115,14 @@ export default {
     setInterval(() => this.fetchStream(), 30000);
   },
   methods: {
-    acknowledgeEvent(event) {
-      const index = this.events.indexOf(event);
+    acknowledgeEvents(events) {
+      events.forEach(event => {
+        const index = this.events.indexOf(event);
 
-      if (index > -1) {
-        this.events.splice(index, 1);
-      }
+        if (index > -1) {
+          this.events.splice(index, 1);
+        }
+      });
     },
     async fetchUser() {
       const result = await this.api.get("users").json();
@@ -182,6 +186,34 @@ export default {
               break;
             }
 
+            case "anonsubgift":
+            case "subgift": {
+              const subscriptionPlan = tags["msg-param-sub-plan"];
+              const recipientName = tags["msg-param-recipient-display-name"];
+
+              const userId = tags["user-id"];
+              const pendingMysteryGift = pendingMysteryGifts.get(userId);
+
+              if (pendingMysteryGift) {
+                const { recipients, subscriptionCount } = pendingMysteryGift;
+
+                if (recipients.push(recipientName) >= subscriptionCount) {
+                  pendingMysteryGifts.delete(userId);
+                }
+              } else {
+                event = {
+                  id: tags.id,
+                  date: new Date(),
+                  type: tags["msg-id"],
+                  username: tags.login,
+                  subscriptionPlan,
+                  recipientName,
+                };
+              }
+
+              break;
+            }
+
             case "submysterygift": {
               const subscriptionCount = toNumber(tags["msg-param-mass-gift-count"]);
               const subscriptionPlan = tags["msg-param-sub-plan"];
@@ -193,7 +225,10 @@ export default {
                 username: tags.login,
                 subscriptionCount,
                 subscriptionPlan,
+                recipients: [],
               };
+
+              pendingMysteryGifts.set(tags["user-id"], event);
 
               break;
             }
@@ -249,7 +284,7 @@ export default {
               type: "cheer",
               username: prefix.name,
               bits: toNumber(tags.bits),
-              message: this.cleanMessage(trailing),
+              message: trailing,
             };
           }
 
@@ -260,11 +295,6 @@ export default {
       if (event) {
         this.events.unshift(event);
       }
-    },
-    cleanMessage(message) {
-      return this.cheermotes
-        .reduce((result, pattern) => result.replace(pattern, ""), message)
-        .trim();
     },
   },
 };

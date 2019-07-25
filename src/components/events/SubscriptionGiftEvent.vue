@@ -1,7 +1,6 @@
 <template>
-  <Event v-bind="{ date, username, title: 'Subscription Mystery Gift', color: '#F63937' }">
-    <div :class="$style.subscriptionPlan">{{ subscriptionCount }}x {{ subscriptionPlanName }}</div>
-    <div :class="$style.recipients">{{ recipients.join(", ") }}</div>
+  <Event v-bind="{ date, username, title: 'Subscription Gift', color: '#F7A734' }">
+    <div :class="$style.subscriptionPlan">{{ subscriptionPlanName }} to {{ recipientName }}</div>
   </Event>
 </template>
 
@@ -14,9 +13,8 @@ export default {
   props: {
     date: Date,
     username: String,
-    subscriptionCount: Number,
     subscriptionPlan: String,
-    recipients: Array,
+    recipientName: String,
   },
   computed: {
     subscriptionPlanName() {
