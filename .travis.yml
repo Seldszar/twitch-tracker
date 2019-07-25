@@ -1,0 +1,26 @@
+language: node_js
+
+cache: yarn
+
+node_js:
+  - 8
+  - 10
+
+notifications:
+  email: false
+
+branches:
+  only:
+    - master
+  except:
+    - /^v\d+\.\d+\.\d+$/
+
+jobs:
+  include:
+    - stage: deploy
+      script:
+        - yarn build
+        - yarn semantic-release
+
+script:
+  - yarn lint
