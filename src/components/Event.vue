@@ -15,6 +15,7 @@ import RelativeTime from "./RelativeTime.vue";
 
 export default {
   components: { RelativeTime },
+  inheritAttrs: false,
   props: {
     date: Date,
     username: String,

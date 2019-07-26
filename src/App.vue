@@ -8,28 +8,28 @@
         <EventPanel
           title="Subscriptions & Resubscriptions"
           :events="events.filter(o => ['sub', 'resub'].includes(o.type))"
-          @acknowledge="acknowledgeEvents"
+          @removeEvents="removeEvents"
         />
       </div>
       <div :class="$style.eventPanel">
         <EventPanel
           title="Subscription Gifts"
           :events="events.filter(o => ['anonsubgif', 'subgift', 'submysterygift'].includes(o.type))"
-          @acknowledge="acknowledgeEvents"
+          @removeEvents="removeEvents"
         />
       </div>
       <div :class="$style.eventPanel">
         <EventPanel
           title="Cheers"
           :events="events.filter(o => ['cheer'].includes(o.type))"
-          @acknowledge="acknowledgeEvents"
+          @removeEvents="removeEvents"
         />
       </div>
       <div :class="$style.eventPanel">
         <EventPanel
           title="Raids & Hosts"
           :events="events.filter(o => ['raid', 'host'].includes(o.type))"
-          @acknowledge="acknowledgeEvents"
+          @removeEvents="removeEvents"
         />
       </div>
     </div>
@@ -66,7 +66,10 @@ export default {
     };
   },
   watch: {
-    events: pThrottle(newValue => localforage.setItem("events", newValue), 1, 1000),
+    events: {
+      deep: true,
+      handler: pThrottle(newValue => localforage.setItem("events", newValue), 1, 1000),
+    },
   },
   async created() {
     const events = await localforage.getItem("events");
@@ -115,7 +118,7 @@ export default {
     setInterval(() => this.fetchStream(), 30000);
   },
   methods: {
-    acknowledgeEvents(events) {
+    removeEvents(events) {
       events.forEach(event => {
         const index = this.events.indexOf(event);
 
@@ -159,6 +162,8 @@ export default {
         }
 
         case "USERNOTICE": {
+          console.log(tags);
+
           switch (tags["msg-id"]) {
             case "raid": {
               event = {
@@ -189,7 +194,7 @@ export default {
             case "anonsubgift":
             case "subgift": {
               const subscriptionPlan = tags["msg-param-sub-plan"];
-              const recipientName = tags["msg-param-recipient-display-name"];
+              const recipientName = tags["msg-param-recipient-name"];
 
               const userId = tags["user-id"];
               const pendingMysteryGift = pendingMysteryGifts.get(userId);
@@ -293,6 +298,8 @@ export default {
       }
 
       if (event) {
+        event.acknowledged = false;
+
         this.events.unshift(event);
       }
     },
