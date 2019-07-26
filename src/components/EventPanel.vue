@@ -2,14 +2,14 @@
   <div :class="$style.wrapper">
     <div :class="$style.header">
       <div :class="$style.title">{{ title }} ({{ events.length }})</div>
-      <button :class="$style.clearButton" @click="$emit('acknowledge', events)">Clear</button>
+      <button :class="$style.clearButton" @click="$emit('removeEvents', events)">Clear</button>
     </div>
     <div :class="$style.events">
       <div
         v-for="event in events"
-        :class="$style.event"
+        :class="[$style.event, { [$style.acknowledged]: event.acknowledged }]"
         :key="event.id"
-        @click="$emit('acknowledge', [event])"
+        @mouseenter="event.acknowledged = true"
       >
         <component v-bind="event" :is="getEventComponent(event)" />
       </div>
@@ -125,10 +125,10 @@ export default {
 }
 
 .event {
-  @apply flex-shrink-0 bg-gray-800 cursor-pointer border-b border-gray-900;
+  @apply flex-shrink-0 bg-gray-800 border-b border-gray-900;
+}
 
-  &:hover {
-    @apply bg-gray-700;
-  }
+.acknowledged {
+  @apply opacity-50;
 }
 </style>

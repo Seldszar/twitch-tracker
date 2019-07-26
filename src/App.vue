@@ -48,7 +48,7 @@ import * as tekko from "tekko";
 import EventPanel from "./components/EventPanel.vue";
 import StreamStatus from "./components/StreamStatus.vue";
 
-const pendingMysteryGifts = new WeakMap();
+const pendingMysteryGifts = new Map();
 
 export default {
   components: {
