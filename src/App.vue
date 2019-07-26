@@ -162,8 +162,6 @@ export default {
         }
 
         case "USERNOTICE": {
-          console.log(tags);
-
           switch (tags["msg-id"]) {
             case "raid": {
               event = {
@@ -194,7 +192,7 @@ export default {
             case "anonsubgift":
             case "subgift": {
               const subscriptionPlan = tags["msg-param-sub-plan"];
-              const recipientName = tags["msg-param-recipient-name"];
+              const recipientName = tags["msg-param-recipient-user-name"];
 
               const userId = tags["user-id"];
               const pendingMysteryGift = pendingMysteryGifts.get(userId);
