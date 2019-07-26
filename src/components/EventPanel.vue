@@ -9,6 +9,7 @@
         v-for="event in events"
         :class="[$style.event, { [$style.acknowledged]: event.acknowledged }]"
         :key="event.id"
+        @click="$emit('removeEvents', [event])"
         @mouseenter="event.acknowledged = true"
       >
         <component v-bind="event" :is="getEventComponent(event)" />
@@ -125,7 +126,11 @@ export default {
 }
 
 .event {
-  @apply flex-shrink-0 bg-gray-800 border-b border-gray-900;
+  @apply flex-shrink-0 bg-gray-800 border-b border-gray-900 cursor-pointer;
+
+  &:hover {
+    @apply bg-gray-700;
+  }
 }
 
 .acknowledged {
