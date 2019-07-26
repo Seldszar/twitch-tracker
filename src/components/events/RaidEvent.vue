@@ -19,6 +19,6 @@ export default {
 
 <style lang="scss" module>
 .viewerCount {
-  @apply text-xs;
+  // ...
 }
 </style>
