@@ -36,4 +36,8 @@ export default {
 .subscriptionPlan {
   // ...
 }
+
+.recipients {
+  @apply mt-2 bg-gray-900 p-2 rounded;
+}
 </style>

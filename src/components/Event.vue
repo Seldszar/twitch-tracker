@@ -28,7 +28,6 @@ export default {
 <style lang="scss" module>
 @keyframes fadeOut {
   to {
-    display: none;
     opacity: 0;
   }
 }
@@ -39,7 +38,7 @@ export default {
   border-color: var(--event-color);
 
   &::after {
-    @apply absolute inset-0;
+    @apply absolute inset-0 pointer-events-none;
 
     animation: fadeOut 1s forwards;
     background-color: var(--event-color);
