@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.wrapper" :style="{ borderColor: color }">
+  <div :class="$style.wrapper" :style="{ '--event-color': color }">
     <div :class="$style.inner">
       <div :class="$style.headline">
         <div :class="$style.username">{{ username }}</div>
@@ -26,8 +26,25 @@ export default {
 </script>
 
 <style lang="scss" module>
+@keyframes fadeOut {
+  to {
+    display: none;
+    opacity: 0;
+  }
+}
+
 .wrapper {
-  @apply flex border-l-4 text-sm;
+  @apply flex border-l-4 relative text-sm;
+
+  border-color: var(--event-color);
+
+  &::after {
+    @apply absolute inset-0;
+
+    animation: fadeOut 1s forwards;
+    background-color: var(--event-color);
+    content: "";
+  }
 }
 
 .inner {
