@@ -9,10 +9,16 @@
         v-for="event in events"
         :class="[$style.event, { [$style.acknowledged]: event.acknowledged }]"
         :key="event.id"
-        @click="$emit('removeEvents', [event])"
         @mouseenter="event.acknowledged = true"
       >
-        <component v-bind="event" :is="getEventComponent(event)" />
+        <div :class="$style.body">
+          <component v-bind="event" :is="getEventComponent(event)" />
+        </div>
+        <button :class="$style.removeButton" @click="$emit('removeEvents', [event])">
+          <svg viewBox="0 0 18 18">
+            <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z" />
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -126,10 +132,32 @@ export default {
 }
 
 .event {
-  @apply flex-shrink-0 bg-gray-800 border-b border-gray-900 cursor-pointer;
+  @apply flex flex-shrink-0 bg-gray-800 border-b border-gray-900 relative;
+
+  .body {
+    @apply flex-1;
+  }
+}
+
+.removeButton {
+  @apply bg-gray-900 border-l border-t border-gray-800 flex flex-shrink-0 items-center p-1;
+
+  border-left-color: theme("colors.gray.900");
 
   &:hover {
+    @apply bg-gray-800;
+  }
+
+  &:focus {
+    @apply outline-none;
+  }
+
+  &:active {
     @apply bg-gray-700;
+  }
+
+  svg {
+    @apply fill-current w-3;
   }
 }
 

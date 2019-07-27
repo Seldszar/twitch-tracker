@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { distanceInWordsToNow } from "date-fns";
+import parseMilliseconds from "parse-ms";
 
 export default {
   props: {
@@ -24,8 +24,25 @@ export default {
     }
   },
   methods: {
+    formatDuration(duration) {
+      const parsed = parseMilliseconds(duration);
+
+      if (parsed.days > 0) {
+        return `${parsed.days}d`;
+      }
+
+      if (parsed.hours > 0) {
+        return `${parsed.hours}h`;
+      }
+
+      if (parsed.minutes > 0) {
+        return `${parsed.minutes}m`;
+      }
+
+      return `${parsed.seconds}s`;
+    },
     updateResult() {
-      this.result = distanceInWordsToNow(this.date);
+      this.result = this.formatDuration(Date.now() - this.date.getTime());
     },
   },
 };
